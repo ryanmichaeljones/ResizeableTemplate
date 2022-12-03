@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <style>
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			overflow: visible;
+			padding: 0;
+			margin: 0;
+		}
+
+		div#gameContainer {
+			background: transparent !important;
+			position: absolute;
+		}
+
+		div#gameContainer canvas {
+			position: absolute;
+		}
+    </style>
+</head>
+<body style="text-align: center; background-color: grey">
+    <div id="gameContainer">
+        <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} style="width: {{{ WIDTH }}}px; height: {{{ HEIGHT }}}px; background: #828080"></canvas>
+        <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+        <script>
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                // Mobile device style: fill the whole browser client area with the game canvas:
+                var meta = document.createElement('meta');
+                meta.name = 'viewport';
+                meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+                document.getElementsByTagName('head')[0].appendChild(meta);
+            }
+
+            var canvas = document.querySelector("#unity-canvas");
+
+            createUnityInstance(canvas, {
+                dataUrl: "Build/{{{ DATA_FILENAME }}}",
+                frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+                codeUrl: "Build/{{{ CODE_FILENAME }}}",
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "{{{ COMPANY_NAME }}}",
+                productName: "{{{ PRODUCT_NAME }}}",
+                productVersion: "{{{ PRODUCT_VERSION }}}",
+                matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+                devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+            });
+
+            function onResize() {
+                var container = canvas.parentElement;
+                var w = window.innerWidth;
+                var h = window.innerHeight;
+
+                var r = {{{ HEIGHT }}} / {{{ WIDTH }}};
+
+                if (w * r > window.innerHeight) {
+                    w = Math.min(w, Math.ceil(h / r));
+                }
+                h = Math.floor(w * r);
+
+                canvas.style.width = w - (r * 100) + "px";
+                canvas.style.height = h - (r * 100) + "px";
+                container.style.top = Math.floor((window.innerHeight - h) / 2) + (r * 50) + "px";
+                container.style.left = Math.floor((window.innerWidth - w) / 2) + (r * 50) + "px";
+            }
+            window.addEventListener('resize', onResize);
+            onResize();
+        </script>
+    </div>
+</body>
+</html>
